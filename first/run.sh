@@ -10,7 +10,4 @@ make
 ./plots/plot1_xz.sh
 ./plots/plot2_xz.sh
 pdflatex report.tex
-rm report.log
-rm report.toc
-rm report.aux
 okular report.pdf
