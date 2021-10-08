@@ -1,0 +1,119 @@
+\documentclass[a4paper]{article}
+\usepackage[14pt]{extsizes} % для того чтобы задать нестандартный 14-ый размер шрифта
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{setspace,amsmath}
+\usepackage{csvsimple}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{{img/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\usepackage[left=20mm, top=15mm, right=15mm, bottom=15mm, nohead, footskip=10mm]{geometry} % настройки полей документа
+ 
+\begin{document} % начало документа
+ 
+\begin{titlepage}
+
+\thispagestyle{empty}
+
+\centerline{Санкт-Петербургский политехнический университет}
+\centerline{Высшая школа теоретической механики, ФизМех}
+
+\vfill
+\centerline{Направление подготовки}
+\centerline{<<01.03.03\_2 Биомеханика и медицинская инженерия>>}
+
+\vfill
+
+\centerline{Индивидуальное задание №1}
+\begin{center}
+    Тема <<Метод конечных разностей. Нестационарное уравнение\\ теплопроводности.>>
+\end{center}    
+\centerline{Дисциплина <<Вычислительная механика>>}
+\centerline{Вариант 9}
+
+\vfill
+
+Выполнила студент гр. 5030103/90201: \hfill Ефимов Г.М. 
+
+Преподаватель: \hfill  Витохин Е.Ю.
+
+\vfill
+
+\centerline{Санкт-Петербург}
+\centerline{\the\year}
+\clearpage
+\end{titlepage}
+
+\newpage
+     
+    \tableofcontents
+\newpage
+ 
+\newpage
+\section{Постановка задачи}
+    Составить решение смешанной задачи для дифференциального уравнения параболического типа $\frac{\partial u}{\partial t} = \frac{\partial^{2} u}{\partial x^{2}}$ (уравнение теплопроводности) используя метод конечных разностей при заданных начальных и граничных условиях:\\
+    \begin{center}
+    $u(x,0)=sin(x)+0.08$\\
+    $u(0,t)=0.08+2 t$\\
+    $u(0.6,t)=0.6446$\\
+    $x \in [0,0.6]$, $t \in [0,0.01]$
+    \end{center}
+    \newpage
+\section{Явная схема}
+    \subsection{Уравнения}
+    Уравнение теплопроводности имеет вид:
+    \begin{equation}\label{eq:parabol_eq}
+        \rho C_v \frac{\partial T}{\partial t}=\lambda \frac{\partial^{2} T}{\partial x^{2}}
+    \end{equation}
+    Разложим $T(x,t)$ в окрестности точки $x_0$ в ряд Тейлора:
+    \begin{equation}\label{eq:taylor_p}
+        T(x_0+h)=T(x_0)+T^{\prime}(x_0) \frac{h}{1!}+T^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
+    \end{equation}
+    \begin{equation}\label{eq:taylor_m} 
+        T(x_0-h)=T(x_0)-T^{\prime}(x_0) \frac{h}{1!}+T^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
+    \end{equation}
+    Складываем \ref{eq:taylor_p} и \ref{eq:taylor_m} уравнения и выражаем $ T^{\prime \prime}(x_0) $:
+    \begin{equation}\label{eq:taylor_sym} 
+        T^{\prime \prime}(x_0)=\frac{T(x_0+h)-2 T(x_0) T(x_0-h)}{h^2}=\frac{T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1}}{h^2}
+    \end{equation}
+    Разложим $T(x,t)$ в окрестности точки $t_0$ в ряд Тейлора:
+    \begin{equation}\label{eq:taylor_p_t} 
+        T(t_0+\Delta t)=T(t_0)+\dot{T}(t_0) \frac{\Delta t}{1!}+o(\Delta t)
+    \end{equation}
+    \begin{equation}\label{eq:taylor_m_t} 
+        T(t_0-\Delta t)=T(t_0)-\dot{T}(t_0) \frac{\Delta t}{1!}+o(\Delta t)
+    \end{equation}
+    Складываем \ref{eq:taylor_p_t} и \ref{eq:taylor_m_t} уравнения и выражаем $ \dot{T}(t_0) $:
+    \begin{equation}\label{eq:taylor_sym_t} 
+        \dot{T}(t_0)=\frac{T(t_0-+Delta t)-T(t_0)}{\Delta t}=\frac{T^{k+1}_{i}+T^{k}_{i}}{\Delta t}
+    \end{equation}
+    Конечно-разностное уравнение теплопроводности примет вид:
+    \begin{equation}\label{eq:mkr} 
+    \rho C_v \frac{T^{k+1}_{i}+T^{k}_{i}}{\Delta t} = \lambda \frac{T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1}}{h^2}
+    \end{equation}
+    Таким образом, явная схема метода имеет вид:
+    \begin{equation}\label{eq:explicit_schema} 
+        T^{k+1}_{i}=\frac{\Delta t \lambda}{\rho h^2 C_v}(T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1})+T^{k}_{i}
+    \end{equation}
+    В текущей задаче примем $\rho \equiv 1$, $C_v \equiv 1$,$\lambda \equiv 1$
+    \newpage
+\subsection{Результаты вычислений}
+    \begin{tabular}{l c}
+    & x\\
+    t &
+    \csvautotabular{"data/data1_latex.csv"}
+    \end{tabular}
+    \captionof{table}{Результаты вычислений температуры при помощи явной схемы.}
+    \begin{figure}[h]
+        \includegraphics[width=0.6\linewidth]{1}
+        \caption{Явная схема. Модель распределения температур относительно пространства и времени.}
+        \label{ris:explicit_3d}
+    \end{figure}
+    \begin{figure}[h]
+        \includegraphics[width=0.6\linewidth]{4}
+        \caption{Явная схема. Изменение температуры в различные моменты времени.}
+        \label{ris:explicit_3d}
+    \end{figure}
+\end{document}
