@@ -7,6 +7,10 @@
 \usepackage{caption}
 \usepackage{graphicx}
 \usepackage{float}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+
 \graphicspath{{img/}}
 \DeclareGraphicsExtensions{.pdf,.png,.jpg}
 \usepackage[left=20mm, top=15mm, right=15mm, bottom=15mm, nohead, footskip=10mm]{geometry} % настройки полей документа
@@ -53,6 +57,7 @@
  
 \newpage
 \section{Постановка задачи}
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
     Составить решение смешанной задачи для дифференциального уравнения параболического типа $\frac{\partial u}{\partial t} = \frac{\partial^{2} u}{\partial x^{2}}$ (уравнение теплопроводности) используя метод конечных разностей при заданных начальных и граничных условиях:\\
     \begin{center}
     $u(x,0)=sin(x)+0.08$\\
@@ -62,58 +67,133 @@
     \end{center}
     \newpage
 \section{Явная схема}
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{2}}  
     \subsection{Уравнения}
-    Уравнение теплопроводности имеет вид:
-    \begin{equation}\label{eq:parabol_eq}
-        \rho C_v \frac{\partial T}{\partial t}=\lambda \frac{\partial^{2} T}{\partial x^{2}}
-    \end{equation}
-    Разложим $T(x,t)$ в окрестности точки $x_0$ в ряд Тейлора:
-    \begin{equation}\label{eq:taylor_p}
-        T(x_0+h)=T(x_0)+T^{\prime}(x_0) \frac{h}{1!}+T^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
-    \end{equation}
-    \begin{equation}\label{eq:taylor_m} 
-        T(x_0-h)=T(x_0)-T^{\prime}(x_0) \frac{h}{1!}+T^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
-    \end{equation}
-    Складываем \ref{eq:taylor_p} и \ref{eq:taylor_m} уравнения и выражаем $ T^{\prime \prime}(x_0) $:
-    \begin{equation}\label{eq:taylor_sym} 
-        T^{\prime \prime}(x_0)=\frac{T(x_0+h)-2 T(x_0) T(x_0-h)}{h^2}=\frac{T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1}}{h^2}
-    \end{equation}
-    Разложим $T(x,t)$ в окрестности точки $t_0$ в ряд Тейлора:
-    \begin{equation}\label{eq:taylor_p_t} 
-        T(t_0+\Delta t)=T(t_0)+\dot{T}(t_0) \frac{\Delta t}{1!}+o(\Delta t)
-    \end{equation}
-    \begin{equation}\label{eq:taylor_m_t} 
-        T(t_0-\Delta t)=T(t_0)-\dot{T}(t_0) \frac{\Delta t}{1!}+o(\Delta t)
-    \end{equation}
-    Складываем \ref{eq:taylor_p_t} и \ref{eq:taylor_m_t} уравнения и выражаем $ \dot{T}(t_0) $:
-    \begin{equation}\label{eq:taylor_sym_t} 
-        \dot{T}(t_0)=\frac{T(t_0-+Delta t)-T(t_0)}{\Delta t}=\frac{T^{k+1}_{i}+T^{k}_{i}}{\Delta t}
-    \end{equation}
-    Конечно-разностное уравнение теплопроводности примет вид:
-    \begin{equation}\label{eq:mkr} 
-    \rho C_v \frac{T^{k+1}_{i}+T^{k}_{i}}{\Delta t} = \lambda \frac{T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1}}{h^2}
-    \end{equation}
-    Таким образом, явная схема метода имеет вид:
-    \begin{equation}\label{eq:explicit_schema} 
-        T^{k+1}_{i}=\frac{\Delta t \lambda}{\rho h^2 C_v}(T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1})+T^{k}_{i}
-    \end{equation}
-    В текущей задаче примем $\rho \equiv 1$, $C_v \equiv 1$,$\lambda \equiv 1$
-    \newpage
-\subsection{Результаты вычислений}
-    \begin{tabular}{l c}
-    & x\\
-    t &
-    \csvautotabular{"data/data1_latex.csv"}
-    \end{tabular}
-    \captionof{table}{Результаты вычислений температуры при помощи явной схемы.}
-    \begin{figure}[h]
-        \includegraphics[width=0.6\linewidth]{1}
-        \caption{Явная схема. Модель распределения температур относительно пространства и времени.}
-        \label{ris:explicit_3d}
-    \end{figure}
-    \begin{figure}[h]
-        \includegraphics[width=0.6\linewidth]{4}
-        \caption{Явная схема. Изменение температуры в различные моменты времени.}
-        \label{ris:explicit_3d}
-    \end{figure}
+        Уравнение теплопроводности имеет вид:
+        \begin{equation}\label{eq:parabol_eq}
+            \rho C_v \frac{\partial T}{\partial t}=\lambda \frac{\partial^{2} T}{\partial x^{2}}
+        \end{equation}
+        Разложим $T(x,t)$ в окрестности точки $x_0$ в ряд Тейлора:
+        \begin{equation}\label{eq:taylor_p}
+            T(x_0+h)=T(x_0)+T^{\prime}(x_0) \frac{h}{1!}+T^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
+        \end{equation}
+        \begin{equation}\label{eq:taylor_m} 
+            T(x_0-h)=T(x_0)-T^{\prime}(x_0) \frac{h}{1!}+T^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
+        \end{equation}
+        Складываем \ref{eq:taylor_p} и \ref{eq:taylor_m} уравнения и выражаем $ T^{\prime \prime}(x_0) $:
+        \begin{equation}\label{eq:taylor_sym} 
+            T^{\prime \prime}(x_0)=\frac{T(x_0+h)-2 T(x_0) T(x_0-h)}{h^2}=\frac{T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1}}{h^2}
+        \end{equation}
+        Разложим $T(x,t)$ в окрестности точки $t_0$ в ряд Тейлора:
+        \begin{equation}\label{eq:taylor_p_t} 
+            T(t_0+\Delta t)=T(t_0)+\dot{T}(t_0) \frac{\Delta t}{1!}+o(\Delta t)
+        \end{equation}
+        \begin{equation}\label{eq:taylor_m_t} 
+            T(t_0-\Delta t)=T(t_0)-\dot{T}(t_0) \frac{\Delta t}{1!}+o(\Delta t)
+        \end{equation}
+        Складываем \ref{eq:taylor_p_t} и \ref{eq:taylor_m_t} уравнения и выражаем $ \dot{T}(t_0) $:
+        \begin{equation}\label{eq:taylor_sym_t} 
+            \dot{T}(t_0)=\frac{T(t_0-+Delta t)-T(t_0)}{\Delta t}=\frac{T^{k+1}_{i}+T^{k}_{i}}{\Delta t}
+        \end{equation}
+        Конечно-разностное уравнение теплопроводности примет вид:
+        \begin{equation}\label{eq:mkr} 
+        \rho C_v \frac{T^{k+1}_{i}+T^{k}_{i}}{\Delta t} = \lambda \frac{T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1}}{h^2}
+        \end{equation}
+        Таким образом, явная схема метода имеет вид:
+        \begin{equation}\label{eq:explicit_schema} 
+            T^{k+1}_{i}=\frac{\Delta t \lambda}{\rho h^2 C_v}(T^{k}_{i+1}-2 T^{k}_{i}+T^{k}_{i-1})+T^{k}_{i}
+        \end{equation}
+        В текущей задаче примем $\rho \equiv 1$, $C_v \equiv 1$,$\lambda \equiv 1$
+        \newpage
+    \subsection{Результаты вычислений}
+        \begin{tabular}{l c}
+        & x\\
+        t &
+        \csvautotabular{"data/data1_latex.csv"}
+        \end{tabular}
+        \captionof{table}{Результаты вычислений температуры при помощи явной схемы.}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{1}
+            \caption{Явная схема. Модель распределения температур относительно пространства и времени.}
+            \label{ris:explicit_3d}
+        \end{figure}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{4}
+            \caption{Явная схема. Изменение температуры в различные моменты времени.}
+            \label{ris:explicit_2d}
+        \end{figure}
+        \newpage
+\section{Неявная схема}
+    \subsection{Формулы}
+        Запишем конечно-разностные выражения производных:
+        \begin{equation}\label{eq:implicit_schema_T_t}
+            \frac{\partial T}{\partial t}=\frac{T^{k+1}_{i}-T^{k}_{i}}{\Delta t}
+        \end{equation}
+        \begin{equation}\label{eq:implicit_schema_T_x2}
+            \frac{\partial^{2} T}{\partial x^{2}}=\frac{T^{k+1}_{i-1}-2 T^{k+1}_{i} +T^{k+1}_{i+1}}{h^2}
+        \end{equation}
+        Подставим \ref{eq:implicit_schema_T_t} и \ref{eq:implicit_schema_T_x2} в уравнение теплопроводности \ref{eq:parabol_eq} и получим уравнение неявной схемы:
+        \begin{equation}\label{eq:implicit_Fi}
+            -A T^{k+1}_{i-1}+B T^{K+1}_{i}- C T^{k+1}_{i+1}=F_{i}
+        \end{equation}
+        \begin{equation}
+            A=C=\frac{\lambda}{h^2}
+        \end{equation}
+        \begin{equation}
+            B=\frac{\rho C_v h^{2}+ 2 \lambda \Delta t}{\Delta t h^2}
+        \end{equation}
+        \begin{equation}
+            F_i=\frac{\rho C_v}{\Delta t} T^{k}_{i}
+        \end{equation}
+        В текущей задаче примем $\rho \equiv 1$, $C_v \equiv 1$,$\lambda \equiv 1$
+        Применим метод прогонки для решения уравнения \ref{eq:implicit_Fi}:
+        \subsubsection*{Прямой ход:}
+            \begin{equation}
+                s_1=\frac{C}{B}
+            \end{equation}
+            \begin{equation}
+                m_1=\frac{F^{k}_{i}}{B}
+            \end{equation}
+            \begin{equation}
+                s_i=\frac{C}{-A s_{i-1}+B}
+            \end{equation}
+            \begin{equation}
+                m_i=\frac{F^{k}_i+A m_{i-1}}{B-A s_{i-1}}
+            \end{equation}
+        \subsubsection*{Обратный ход:}
+            \begin{equation}
+                T^{k+1}_i=s_i T^{k+1}_{i+1}+m_i
+            \end{equation}
+        \newpage
+    \subsection{Результаты вычислений}
+        \begin{tabular}{l c}
+            & x\\
+            t &
+            \csvautotabular{"data/data2_latex.csv"}
+        \end{tabular}
+        \captionof{table}{Результаты вычислений температуры при помощи неявной схемы.}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{2}
+            \caption{Неявная схема. Модель распределения температур относительно пространства и времени.}
+            \label{ris:implicit_3d}
+        \end{figure}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{5}
+            \caption{Неявная схема. Изменение температуры в различные моменты времени.}
+            \label{ris:implicit_2d}
+        \end{figure}
+        \newpage
+    \section{Сравнение явной и неявной схемы}
+        \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{3}
+            \caption{Сравнение срезов явной и неявной схемы в разные моменты времени}
+            \label{ris:diff_2d}
+        \end{figure}
+        По рисунку \ref{ris:diff_2d} можно сделать вывод, что явная схема даёт более гладкое решение, чем неявная.
+        \newpage
+    \section{Исходный код программы}
+        \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+        main.cpp:
+        \VerbatimInput{main.cpp}
 \end{document}

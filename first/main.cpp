@@ -137,6 +137,7 @@ void implicit_schema(){
         T[N_x-1][i]=u_t_right(i*dt);
     }
     write_xyz("data/data2_xyz.csv",T);
+    write_pre_latex("data/data2_latex.csv",T);
     write_xz("data/data2_1_xz.csv",N_t-3,T);
     write_xz("data/data2_2_xz.csv",N_t-2,T);
     write_xz("data/data2_3_xz.csv",N_t-1,T);
