@@ -69,7 +69,7 @@ void write_xz(std::string file,int N,double T[N_x][N_t]){
     std::ofstream out;
     out.open(file);
     if(out.is_open()){
-        out <<"x dt="<<N*dt<<std::endl;
+        out <<"x t="<<N*dt<<std::endl;
         for(int i=0;i<N_x;i++){
             out <<i*h<<" "<< T[i][N]<<std::endl;
         }
@@ -123,8 +123,8 @@ void implicit_schema(){
         }
         double S[N_x];
         double M[N_x];
-        S[1]=C/B;
-        M[1]=F[0]/B;
+        S[0]=C/B;
+        M[0]=F[0]/B;
         for(int j=1;j<N_x;j++){
             S[j]=C/(-A*S[j-1]+B);
             M[j]=(F[j]+A*M[j-1])/(B-A*S[j-1]);
