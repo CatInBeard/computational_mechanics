@@ -1,0 +1,222 @@
+\documentclass[a4paper]{article}
+\usepackage[14pt]{extsizes} % для того чтобы задать нестандартный 14-ый размер шрифта
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{setspace,amsmath}
+\usepackage{csvsimple}
+\usepackage{caption}
+\usepackage{graphicx}
+\usepackage{float}
+
+\usepackage[dvipsnames]{xcolor}
+\usepackage{fancyvrb}
+
+\graphicspath{{img/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\usepackage[left=20mm, top=15mm, right=15mm, bottom=15mm, nohead, footskip=10mm]{geometry} % настройки полей документа
+ 
+\begin{document} % начало документа
+ 
+\begin{titlepage}
+
+\thispagestyle{empty}
+
+\centerline{Санкт-Петербургский политехнический университет}
+\centerline{Высшая школа теоретической механики, ФизМех}
+
+\vfill
+\centerline{Направление подготовки}
+\centerline{<<01.03.03\_2 Биомеханика и медицинская инженерия>>}
+
+\vfill
+
+\centerline{Индивидуальное задание №2}
+\begin{center}
+    Тема <<Метод конечных разностей. Уравнение колебания\\ струны.>>
+\end{center}    
+\centerline{Дисциплина <<Вычислительная механика>>}
+\centerline{Вариант 9}
+
+\vfill
+
+Выполнила студент гр. 5030103/90201: \hfill Ефимов Г.М. 
+
+Преподаватель: \hfill  Витохин Е.Ю.
+
+\vfill
+
+\centerline{Санкт-Петербург}
+\centerline{\the\year}
+\clearpage
+\end{titlepage}
+
+\newpage
+     
+    \tableofcontents
+\newpage
+\section{Постановка задачи}
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+    Составить решение смешанной задачи для дифференциального уравнения колебания струны $\frac{\partial^{2} u}{\partial t^2} = \frac{\partial^{2} u}{\partial x^{2}}$ используя метод конечных разностей при заданных начальных и граничных условиях:\\
+    \begin{center}
+    $u(x,0)=x ( 2 x - 0.5 )$\\
+    $u_{t}(x,0)=cos(2 x)$\\
+    $u(0,t)=t^{2}$\\
+    $u(0.6,t)=1.5$\\
+    $x \in [0,1]$, $t \in [0,0.5]$
+    \end{center}
+    \newpage
+\section{Явная схема}
+    \addtocontents{toc}{\protect\setcounter{tocdepth}{2}}  
+    \subsection{Уравнения}
+        Уравнение теплопроводности имеет вид:
+        \begin{equation}\label{eq:parabol_eq}
+            \frac{\partial^2 u}{\partial x^2} - \frac{1}{c^{2}} \frac{\partial^2 u}{\partial t^2}=0
+        \end{equation}
+        Где $c$ --- это скорость распространения звуковых волн
+        Разложим $U(x,t)$ в окрестности точки $x_0$ в ряд Тейлора:
+        \begin{equation}\label{eq:taylor_p}
+            U(x_0+h)=U(x_0)+U^{\prime}(x_0) \frac{h}{1!}+U^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
+        \end{equation}
+        \begin{equation}\label{eq:taylor_m} 
+            U(x_0-h)=U(x_0)-U^{\prime}(x_0) \frac{h}{1!}+U^{\prime \prime}(x_0) \frac{h^{2}}{2!}+o(h^2)
+        \end{equation}
+        Складываем \ref{eq:taylor_p} и \ref{eq:taylor_m} уравнения и выражаем $ U^{\prime \prime}(x_0) $:
+        \begin{equation}\label{eq:taylor_sym} 
+            U^{\prime \prime}(x_0)=\frac{U(x_0+h)-2 U(x_0) U(x_0-h)}{h^2}=\frac{U^{k}_{i+1}-2 U^{k}_{i}+U^{k}_{i-1}}{h^2}
+        \end{equation}
+        Разложим $U(x,t)$ в окрестности точки $t_0$ в ряд Тейлора:
+        \begin{equation}\label{eq:taylor_p_t} 
+            U(t_0+\Delta t)=U(t_0)+\dot{U}(t_0) \frac{\Delta t}{1!}+\ddot{U}(t_0) \frac{\Delta t^2}{1!}+o(\Delta t^{2})
+        \end{equation}
+        \begin{equation}\label{eq:taylor_m_t} 
+            U(t_0-\Delta t)=U(t_0)-\dot{U}(t_0) \frac{\Delta t}{1!}+\ddot{U}(t_0) \frac{\Delta t^2}{1!}+o(\Delta t^{2})
+        \end{equation}
+        Складываем \ref{eq:taylor_p_t} и \ref{eq:taylor_m_t} уравнения и выражаем $ \dot{U}(t_0) $:
+        \begin{equation}\label{eq:taylor_sym_t} 
+            \ddot{U}(t_0)=\frac{U(t_o-\Delta t)-2 U(t_0)+U(t_0+\Delta t)}{\Delta t^2}
+        \end{equation}
+        Введём сетки для пространства $x=i*h$ и времени $t=j \Delta t$. Тогда выражения \ref{eq:taylor_sym} и \ref{eq:taylor_sym_t} примут вид: 
+        \begin{equation}\label{eq:mkr} 
+            U^{\prime \prime} = \frac{U^{k}_{i-1}-2 U^{k}_{i}+U^{k}_{i+1}}{h^2}
+        \end{equation}
+        \begin{equation}\label{eq:mkr_dt} 
+            \ddot{U} = \frac{U^{k-1}_{i}-2 U^{k}_{i}+U^{k+1}_{i}}{t^2}
+        \end{equation}
+        Подставим выражения \ref{eq:mkr}, \ref{eq:mkr_dt} в \ref{eq:parabol_eq} и получим конечно-разностное уравнение:
+        \begin{equation}
+            \frac{U^{k}_{i-1}-2 U^{k}_{i}+U^{k}_{i+1}}{h^2}-\frac{1}{c^2} \frac{U^{k-1}_{i}-2 U^{k}_{i}+U^{k+1}_{i}}{t^2}
+        \end{equation}
+        Таким образом, явная схема метода имеет вид:
+        \begin{equation}\label{eq:explicit_schema} 
+            U^{k+1}_{i}=\frac{c^2 \Delta t^{2}}{h^2}(U^{k}_{i-1}-2 U^{k}_{i}+U^{k}_{i+1})+2 U^{k}_{i}-U^{k-1}_{i}
+        \end{equation}
+        Чтобы применить схему, необходимо заполнить второй слой по времени. Для этого рассмотрим формулу:
+        \begin{equation}\label{eq:U_x_t}
+            U(0+\Delta t)=U(0)+\dot{U}(0) \frac{\Delta t}{1!}+\ddot{U}(0) \frac{\Delta t^2}{2!}+o(\Delta t^2)
+        \end{equation}
+        По формуле \ref{eq:parabol_eq}
+        \begin{equation}\label{eq:U_dd_t}
+            \ddot{U}(0)=c^2 U^{\prime \prime}(0)=\frac{c^{2}}{h^{2}}(U^{0}_{i-1}-2 U^{0}_{i}+U^{0}_{i+1})
+        \end{equation}
+        Используя формулу \ref{eq:U_x_t}, формула \ref{eq:U_dd_t} принимает вид:
+        \begin{equation}\label{eq:U_dd_t}
+            U^{1}_{i}= U^{0}_{i}+U^{0}_{t_{i}}+\frac{c^{2} \Delta t^2}{2 h^{2}}(U^{0}_{i-1}-2 U^{0}_{i}+U^{0}_{i+1})
+        \end{equation}             
+        В текущей задаче примем $c=1,h=0.1, \Delta t=0.045$
+        \newpage
+    \subsection{Результаты вычислений}
+        \tiny
+        \begin{tabular}{l c}
+        & x\\
+        t &
+        \csvautotabular{"data/data1_latex.csv"}
+        \end{tabular}
+        \normalsize
+        \captionof{table}{Результаты вычислений поперечного перемещения колебаний струны при помощи явной схемы.}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{1}
+            \caption{Явная схема. Модель поперечного перемещения колебаний струны.}
+            \label{ris:explicit_3d}
+        \end{figure}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{4}
+            \caption{Явная схема. Изменение температуры в различные моменты времени.}
+            \label{ris:explicit_2d}
+        \end{figure}
+        \newpage
+\section{Неявная схема}
+    \subsection{Формулы}
+        Запишем конечно-разностные выражения производных:
+        \begin{equation}\label{eq:implicit_schema_U_t}
+            \frac{\partial^{2} U}{\partial t^{2}}=\frac{U^{k-1}_{i+1}-2 U^{k}_{i+1}-U^{k+1}_{i}}{\Delta t}
+        \end{equation}
+        \begin{equation}\label{eq:implicit_schema_U_x2}
+            \frac{\partial^{2} U}{\partial x^{2}}=\frac{U^{k+1}_{i-1}-2 U^{k+1}_{i} +U^{k+1}_{i+1}}{h^2}
+        \end{equation}
+        Подставим \ref{eq:implicit_schema_U_t} и \ref{eq:implicit_schema_U_x2} в уравнение теплопроводности \ref{eq:parabol_eq} и получим уравнение неявной схемы:
+        \begin{equation}\label{eq:implicit_Fi}
+            -A U^{k+1}_{i-1}+B U^{K+1}_{i}- C U^{k+1}_{i+1}=F_{i}
+        \end{equation}
+        \begin{equation}
+            A=C=\frac{1}{h^2}
+        \end{equation}
+        \begin{equation}
+            B=\frac{h^{2}+ 2 \Delta t^2}{c^{2} \Delta t^2 h^2}
+        \end{equation}
+        \begin{equation}
+            F_i=\frac{2 U^{k}_{i} - U^{k-1}_{i}}{\Delta t^2 C^2}
+        \end{equation}
+        В текущей задаче примем $c=1,h=0.1, \Delta t=0.045$
+        Применим метод прогонки для решения уравнения \ref{eq:implicit_Fi}:
+        \subsubsection*{Прямой ход:}
+            \begin{equation}
+                s_1=\frac{C}{B}
+            \end{equation}
+            \begin{equation}
+                m_1=\frac{F^{k}_{i}}{B}
+            \end{equation}
+            \begin{equation}
+                s_i=\frac{C}{B-A s_{i-1}}
+            \end{equation}
+            \begin{equation}
+                m_i=\frac{F^{k}_i+A m_{i-1}}{B-A s_{i-1}}
+            \end{equation}
+        \subsubsection*{Обратный ход:}
+            \begin{equation}
+                U^{k+1}_i=s_i U^{k+1}_{i+1}+m_i
+            \end{equation}
+        \newpage
+    \subsection{Результаты вычислений}
+        \tiny
+        \begin{tabular}{l c}
+            & x\\
+            t &
+            \csvautotabular{"data/data2_latex.csv"}
+        \end{tabular}
+        \normalsize
+        \captionof{table}{Результаты вычислений поперечного перемещения колебаний струны при помощи неявной схемы.}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{2}
+            \caption{Неявная схема. Модель поперечного перемещения колебаний струны.}
+            \label{ris:implicit_3d}
+        \end{figure}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{5}
+            \caption{Неявная схема. Перемещения в различные моменты времени.}
+            \label{ris:implicit_2d}
+        \end{figure}
+        \newpage
+    \section{Сравнение явной и неявной схемы}
+        \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+        \begin{figure}[h]
+            \includegraphics[width=0.6\linewidth]{3}
+            \caption{Сравнение срезов явной и неявной схемы в разные моменты времени.}
+            \label{ris:diff_2d}
+        \end{figure}
+        %По рисунку \ref{ris:diff_2d} можно сделать вывод, что явная схема даёт более гладкое решение, чем неявная.
+        \newpage
+    \section{Исходный код программы}
+        \addtocontents{toc}{\protect\setcounter{tocdepth}{1}}
+        \textbf{main.cpp:}
+        \VerbatimInput{main.cpp}
+\end{document}
